@@ -6,12 +6,14 @@ An early prototype of a reusable autonomy capability for robots: mapping their s
 
 ## What works today
 
-The demo runs in a browser using a scan of a real room. **The robot, its sensors and its movement are simulated.**
+The demo uses a **3D room scan created with Polycam**, an external tool, as a prepared environment for study and development. **The robot, its sensors and its movement are simulated.**
+
+HomeMind builds its own navigation map from simulated sensor readings. Reconstructing the 3D environment directly with the robot's own sensors is a future goal.
 
 - **Mapping & autonomous exploration:** builds a 2D map from virtual depth readings, distinguishing free space, obstacles and unknown areas.
 - **Pose estimation:** tracks the robot's position and heading from simulated motion readings, with optional sensor noise.
 - **Navigation & route planning:** moves toward selected destinations in discovered space and replans when a route is blocked.
-- **Visualization & export:** shows the virtual camera, sensor map and 3D reconstruction; exports maps, run summaries and AI observations.
+- **Visualization & export:** shows the virtual camera, sensor map and a 3D representation of the discovered map; exports maps, run summaries and AI observations.
 
 This is a supervised prototype. Exploration can stop before covering the whole room.
 
@@ -23,7 +25,7 @@ This is a supervised prototype. Exploration can stop before covering the whole r
 
 ![Sensor map and 3D reconstruction of the space discovered by the simulated robot](docs/images/discovered-maps.jpg)
 
-*Discovered space shown as a sensor map and a 3D reconstruction.*
+*HomeMind's discovered navigation map, shown in 2D and 3D.*
 
 ## Where we want to go
 
