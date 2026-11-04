@@ -1,190 +1,36 @@
 # HomeMind
 
-Navegación robótica simulada sobre escaneos reales de Polycam, con percepción de objetos mediante **Muse Spark 1.3 + SAM 3.1** de Meta Model API. Entregable para el Meta Global AI Developer Hackathon 2026.
+[Español](README.es.md)
 
-## Inicio rápido para evaluar la entrega
+An early prototype exploring how a home robot could understand a request and move toward the right object.
 
-Requiere **Node.js 22.12+**, npm y un navegador con WebGL 2.
+## What works today
+
+The demo runs in a browser using a scan of a real room. **The robot, its sensors and its movement are simulated.**
+
+- It explores and builds a map, and you can choose a destination in the area it has discovered.
+- On request, Muse Spark interprets the robot's camera image and SAM identifies a visible object. These are real calls to Meta's AI models.
+- It can attempt to approach that object when it has enough distance information and a known route.
+
+This is a supervised prototype. Exploration can stop before covering the whole room, and an AI observation does not guarantee that the robot can reach the object.
+
+## Where we want to go
+
+A physical robot that responds to requests such as **“go to the charger”**: finding the target, reaching it and, eventually, docking.
+
+We still need to search for objects outside the current view, remember them across observations, and validate the system on real hardware. Physical docking and charging have not been demonstrated.
+
+## Try it
+
+Requires Node.js 22.12+ and a browser with WebGL 2.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Abre **http://127.0.0.1:5173/scan-navigation.html**, la demo principal. Los dos escaneos GLB están incluidos en `public/scans/`; no necesitas descargarlos por separado. Detén otro servidor que ya use el puerto 5173 antes de arrancar.
+Open [the main demo](http://127.0.0.1:5173/scan-navigation.html). Select **EN** for English. The room scans are included.
 
-Para activar la IA, copia `.env.example` a `.env`, configura `MODEL_API_KEY` con tu clave de Meta Model API y reinicia `npm run dev`. La navegación funciona sin clave; el análisis de objetos requiere credenciales válidas y acceso a ambos modelos. Como alternativa local se admite la clave existente de Muse Code. `.env` queda excluido de Git y la clave se utiliza únicamente en el servidor.
+For object recognition, copy `.env.example` to `.env`, add your Meta API key as `MODEL_API_KEY`, and restart. Navigation can run without a key. Use `npm run dev` for the AI demo; the static preview does not include the AI service.
 
-1. Pulsa **Explorar** para construir el mapa desde las lecturas simuladas.
-2. Selecciona **Cámara del elemento (E0R1)** para observar desde el robot y pausa frente a un objeto visible.
-3. En **Encontrar un objeto con IA**, escribe qué buscar y pulsa **Analizar con Muse + SAM**.
-4. Revisa la máscara y la posición estimada. Si existe suficiente profundidad y una ruta conocida, pulsa **Acercarse a este objeto**.
-5. Usa **Exportar observación IA** y **Exportar prueba JSON** para conservar la evidencia.
-
-Se demuestra percepción y aproximación en simulación; el acoplamiento físico, la orientación funcional del objeto y la búsqueda semántica fuera de la vista actual siguen pendientes. Una detección sin profundidad o sin ruta no autoriza movimiento.
-
-| Entrada | Contenido |
-|---|---|
-| `scan-navigation.html` | Demo principal: escaneo real, navegación e IA de Meta |
-| `scan.html` | Visor y calibración del escaneo |
-| `motor.html` | Motor de navegación V2 y escenas virtuales |
-| `index.html` | Laboratorio de exploración, keyframes e inventario de marcadores |
-
-```sh
-npm test
-npm run build
-npm run preview
-```
-
-`npm run preview` sirve `dist/` como web estática: **no incluye `/api/ai/*`**. Para la demostración con Muse + SAM usa `npm run dev`. GitHub aloja el código; GitHub Pages por sí solo no ejecuta el backend de IA. El workflow de GitHub Actions comprueba instalación, pruebas y compilación en cada push o pull request.
-
-Ver [informe de entrega](ENTREGA-2026-11-04.md), [alcance del proyecto](docs/PROJECT_CONTEXT.md) y [evidencia de una llamada real a Meta](docs/meta-ai-evidence.json). El informe distingue las comprobaciones actuales de la evidencia histórica.
-
-## Documentación técnica · Fase 4
-
-## Escaneo real de Polycam
-
-**IA real de Meta (Muse + SAM):** en `scan-navigation.html`, escribe una instrucción y pulsa «Analizar con Muse + SAM». Se pausa el recorrido y se captura RGB a 640 × 360 desde la cámara física virtual, a 60 cm y con 80° de campo horizontal. Muse Spark 1.3 analiza únicamente esa imagen y selecciona un concepto visible; SAM 3.1 devuelve las cajas y máscaras reales mediante Meta Model API. La interfaz dibuja esa evidencia y permite exportar captura, pose estimada, respuesta, máscaras, modelos e identificadores de petición. Si no aparece el objeto, SAM no lo confirma o la API falla, no se inventa una detección ni un destino.
-
-El plugin de Vite `server/meta-ai.js` hace las peticiones a `https://api.meta.ai/v1/responses`. Usa `MODEL_API_KEY` o `META_API_KEY`; como alternativa local, lee la API key ya guardada por Muse Code en `~/.config/muse/auth.json`. No copia la clave al repositorio ni la devuelve al navegador. `npm run dev` sirve la aplicación y `/api/ai/status` y `/api/ai/analyze`; reinicia el servidor si estaba iniciado antes de crear la configuración de Vite. `npm run preview` sirve solo los archivos compilados y no incluye este backend de desarrollo. Cada análisis consume llamadas reales de la cuenta Meta; no se analiza cada fotograma.
-
-La máscara se combina con retornos de **profundidad virtual** limitados a 3,8 m, obtenidos exclusivamente en los píxeles observados. Se convierten a coordenadas del mapa usando la pose estimada de captura; el modelo no recibe la malla, la pose verdadera ni un inventario oculto. Se necesitan al menos cinco retornos coherentes; si faltan, no se habilita la aproximación. «Acercarse a este objeto» busca una posición libre a 0,55–1,25 m del punto observado, calcula la ruta usando solo el mapa descubierto y al llegar gira hacia ese punto. Esto no estima la orientación funcional del objeto, no demuestra conexión al cargador y todavía no es un inventario persistente con identidad fusionada entre capturas. El primer alcance es percepción de un objeto visible, localización estimada y aproximación; si el objetivo no está en la vista actual, debe explorarse para observarlo.
-
-**Elegir destino:** haz clic en el suelo blanco del mapa de `scan-navigation.html`. Se valida que el punto esté descubierto, que quepa la huella y que exista una conexión en el mapa del robot. Un marcador rojo muestra el destino y una línea azul la ruta; el motor toma el control y la cámara a bordo acompaña el recorrido. Elegir otro punto sustituye el destino y vuelve a calcular la ruta sin reiniciar el mapa ni trasladar instantáneamente al robot. Las coordenadas y la distancia restantes se muestran en el marco estimado; la llegada usa la tolerancia del motor. «Cancelar destino» detiene el recorrido y elimina el objetivo. La referencia completa del observador no permite elegir puntos todavía desconocidos para el robot. Los controles manuales quedan en una sección opcional.
-
-**Dirección manual:** «Tomar dirección» activa la cámara a bordo y pausa la exploración automática sin borrar el mapa. Mantén pulsados los botones de dirección o W/S para avanzar/retroceder y A/D para girar (también flechas). Soltar todas las direcciones detiene el movimiento. «Parar», Espacio y Esc detienen la simulación; perder foco o esconder la página detiene el modo manual y limpia las teclas pulsadas. La conducción manual utiliza 1×, conserva las lecturas y la odometría, respeta las colisiones y los límites de suelo de la configuración actual. Tras una parada por suelo desconocido permite girar o retroceder desde el mismo punto. «Explorar automático» devuelve el control al motor y recupera la velocidad de exploración anterior.
-
-En `scan-navigation.html`, **Cámara del robot** acompaña su posición física y orientación durante la exploración, con montaje a 60 cm del suelo y campo horizontal de 80°. Muestra las texturas originales con la malla completa, sin el corte superior de las vistas Planta/Órbita ni el cuerpo del robot delante del lente. Cambiar de vista conserva la misión; Pausar congela la navegación y permite inspeccionar la imagen. Para seguir los giros resulta útil seleccionar 1×. Esta imagen es una cámara virtual renderizada desde el escaneo, con sus huecos y texturas fijas; todavía no alimenta percepción RGB ni navegación visual. El planificador continúa usando sus lecturas de profundidad y odometría.
-
-`http://127.0.0.1:5173/scan.html` abre la captura `10_28_2026.glb`, extraída del ZIP proporcionado por el usuario y guardada en `public/scans/polycam-2026-10-28/`. También hay un enlace desde el motor V2. El GLB original permanece intacto: SHA-256 `02fd670b8b7726c164ec782c113d842770faeef7a6837d03da09340aa3aec604`. Contiene dos mallas, 118.302 triángulos y dos imágenes JPEG incorporadas; no requiere texturas externas.
-
-El visor permite órbita, cámara interior, planta, modelo completo, corte horizontal, textura/geometría y exportación PNG de la vista actual. Usa las fotografías de la captura como color, sin añadir reflejos metálicos al escaneo. El corte solo afecta a la presentación. La rejilla queda bajo el mínimo Y capturado como referencia visual; no representa un suelo detectado ni completa superficies ausentes.
-
-Las extensiones nominales del archivo son aproximadamente 3,32 × 3,46 m en X/Z y 2,53 m de alto. El usuario confirmó una baldosa de **32,7 cm de lado sin junta**: «Marcar lado de baldosa» permite seleccionar dos puntos de la misma baldosa en planta. El ajuste se guarda en el navegador, se comparte con la página de navegación y se incluye en la exportación JSON. Su precisión depende de la textura, la reconstrucción y la selección manual; no equivale a una medición topográfica. Restaurar escala elimina ese ajuste. Los huecos y deformaciones se conservan. No se sube el archivo a servicios externos.
-
-`http://127.0.0.1:5173/scan-navigation.html` ejecuta el mismo `createNavigator` del motor V2 sobre la captura. El adaptador físico extrae suelo horizontal observado y obstáculos entre 8 y 60 cm sobre él, para un cuerpo circular de 50 cm de diámetro. La rejilla de referencia tiene celdas de 5 cm; el soporte de suelo exige cinco muestras por celda. Es una aproximación discretizada: no rellena huecos y no certifica la ausencia de obstáculos sin capturar. Si no cabe la huella, rechaza el arranque.
-
-El motor empieza con la huella inicial y recibe únicamente profundidad virtual (121 columnas en cinco alturas, 80° de campo y 3,8 m de alcance) y odometría medida con sesgo/ruido opcionales. La geometría completa se usa para lecturas, movimiento físico y visualización del observador; nunca se precarga como mapa del planificador. La pose inicial es un punto conocido de colocación segura del simulador, no una relocalización automática. La página permite explorar, pausar, reiniciar, cambiar velocidad y exportar mapa/resumen/calibración con diagnósticos del observador separados. No inventa detecciones semánticas RGB.
-
-Durante la exploración por fronteras, el robot sigue las celdas de la ruta y se orienta antes de avanzar. Los desplazamientos a un destino conocido y el retorno conservan los giros graduales y los puntos adelantados, siempre dentro del mapa observado.
-
-Si parte pegado a una pared, puede validar una retirada corta antes de aceptar y ejecutar la ruta al destino. Si no puede retroceder respecto a su rumbo actual, busca una salida verificada delante o a un lado, gira en el sitio y espera una lectura frontal nueva y válida antes de avanzar despacio. Sin esa lectura, la maniobra se detiene. La salida admite únicamente un pequeño solapamiento ya existente en la estimación: debe alejarse de las celdas afectadas sin entrar en ninguna celda desconocida u ocupada nueva. Las marcas de contacto no se extienden hacia el interior del cuerpo. No se borra la pared del mapa para permitir la salida. El resumen exportado incluye la causa y fase de recuperación.
-
-Al alcanzar suelo no verificado, se detiene el avance. En automático, el motor recibe esa señal e intenta retirarse por espacio conocido, volver a observar y elegir otra salida; los intentos están limitados y la misión puede terminar limitada si no hay retirada segura. En manual se conserva la parada y se puede girar o retroceder. El límite de captura no genera un contacto de pared ficticio ni rellena el hueco. Ver una pared tras un hueco tampoco despeja ese hueco. `freeDistance` conserva el tramo de suelo observado en la fusión y en las observaciones/reconstrucciones de SLAM. La vista completa y la casilla de referencia pertenecen solo al observador. No se fuerza cobertura completa.
-
-`node scripts/analyze-scan.mjs` inspecciona la geometría a escala nominal. `node --test test/scan-world.test.js` verifica huecos, colisiones, lecturas tras suelo ausente, escala y un recorrido con la captura real. La compilación genera cuatro entradas: `index.html`, `motor.html`, `scan.html` y `scan-navigation.html`, junto con el modelo en la carpeta pública. Para utilizar la página en otro checkout debe copiarse también el GLB al mismo destino; el ZIP original de Descargas no se modifica.
-
-La medición manual realizada sobre el lado visible de una baldosa dio 0,30952 m nominales: factor **1,05647**, extensión ajustada aproximada **3,51 × 3,66 m**. Los puntos y la referencia están en `docs/polycam-calibration.json`; es evidencia de la medición, no un ajuste automático en otros navegadores. `node scripts/evaluate-scan.mjs --calibration docs/polycam-calibration.json` reproduce la prueba con semilla 7 y ruido activado. El resultado guardado en `docs/polycam-evaluation.json` recorre 1,815 m en 26,25 s simulados, sin contactos, y se detiene ante suelo no verificado; error observado de posición de 4,65 cm. Estos resultados describen esta captura y configuración, no cobertura completa del cuarto.
-
-Laboratorio local de exploración y observación de marcadores. La escena inicial tiene una pared con abertura de 1 m; se puede elegir la habitación vacía como control, una abertura estrecha de 0,3 m, una habitación grande de 12 × 16 m con abertura de 1,4 m o una casa de 10 × 8 m con 3 cuartos y puertas de 1 m, con o sin desorden, o un departamento de 11 × 9 m con 6 cuartos asimétricos. Cada escena contiene tres tableros de color a la altura de la cámara. Cambiar de escenario reinicia la simulación. La vista completa pertenece al observador humano. Por defecto el robot trabaja con **odometría medida ruidosa** (encoders de ruedas + giróscopo, sin acceso a la verdad); la casilla de ruido restaura la pose exacta como control. El modo ruidoso puede activar una corrección de SLAM 2D experimental durante la misión.
-
-## Iniciar y validar
-
-Requiere Node.js 22.12 o superior, npm y un navegador con WebGL 2:
-
-```sh
-npm install
-npm run dev
-npm test
-npm run evaluate
-npm run evaluate:ruido
-npm run evaluate:slam
-npm run benchmark:slam -- docs/slam-benchmark.json
-npm run compare:10 -- partition
-npm run build
-```
-
-Abre la dirección local indicada por Vite. Las pruebas comprueban oclusión y ausencia de retorno, seguridad de la ruta y ciclos completos con físicas, sensor y explorador. `npm run evaluate` genera un informe JSON para las escenas, incluidas la sala grande y la casa. En las escenas transitables exige observar al menos 95 % del suelo y de las paredes; en la abertura de 0,3 m exige detenerse con exploración limitada, conservar regiones desconocidas y no atravesar el paso. Todas deben terminar sin colisiones ni pasos con la huella fuera del espacio libre conocido. La geometría real se usa como referencia de la evaluación, nunca para guiar el planificador. La métrica de suelo excluye celdas que se solapan con superficies de pared.
-
-## Uso
-
-Pulsa **Explorar** para un barrido inicial y navegación autónoma. **Pausar**, **Detener**, Espacio, perder el foco o cambiar de pestaña detienen la exploración; vuelve a iniciarla con **Reanudar**. Los controles manuales WASD, flechas y botones táctiles pausan el modo autónomo. Con un botón de dirección enfocado también puedes mantener Enter. Reiniciar borra pose, trayectoria, mapa, lecturas y estado de la ejecución. Exportar descarga un JSON con la rejilla, configuración y lecturas del sensor, pose por paso y estado del explorador.
-
-**Comparar 10 pasadas** ejecuta exactamente diez simulaciones independientes de la escena actual en segundo plano, con el mismo modelo de sesgos y patinaje, distintas semillas de ruido y sentidos de barrido alternos. Al comenzar copia el ajuste de corrección durante la misión; conserva siempre el modelo de sensores ruidosos del banco de pruebas. Son ejecuciones virtuales, no mediciones físicas ni diez agentes. El panel muestra progreso, permite cancelar, examinar los diez mapas y sus estados —también si alguna pasada terminó parcialmente— y exportar los resultados en JSON. Reiniciar o cambiar de escenario cancela la comparación activa; iniciar otra reemplaza los resultados anteriores.
-
-La comparación alinea las pasadas utilizando celdas ocupadas observadas y un origen de partida común conocido. Busca una corrección rígida local de hasta ±0,4 m y ±0,08 rad respecto de la primera pasada. Si falta evidencia o la alineación es ambigua, conserva ese origen y lo indica: no garantiza una correspondencia correcta. No corrige deformaciones internas del mapa. Cada pasada aporta como máximo un voto por celda: desconocido no vota, se requieren al menos tres votos coincidentes para mostrar consenso, y si hay votos tanto libres como ocupados se muestra conflicto aunque una categoría tenga mayoría. El mapa de comparación distingue desconocido, evidencia insuficiente, consenso libre, consenso ocupado y conflicto; selecciona una celda para ver sus votos. El sesgo compartido puede hacer que las diez pasadas coincidan en un error. El consenso no es la verdad del entorno y no se utiliza para controlar el robot. El lote siempre usa ruido, incluso si se desmarca el control ideal de la simulación principal, y copia la correa actual al iniciarse. Son diez ejecuciones nuevas desde la base, no una continuación del mapa principal. Cada ejecución tiene un límite computacional de 24.000 pasos (400 s simulados), independiente del contador de pérdida de localización. Las semillas permiten repetir el experimento en el mismo entorno de ejecución; pequeñas diferencias numéricas entre motores pueden alterar la ruta.
-
-**Capturar** inicia la captura o solicita una imagen manual; Explorar y el movimiento manual también la activan. La selección automática guarda una primera imagen y luego keyframes al desplazarse al menos 0,10 m o girar 10°, con intervalo mínimo de 0,15 s y límite visible de 400. Las imágenes quietas no se duplican automáticamente. La galería muestra las 12 más recientes; la exportación incluye todas con PNG, pose, tiempo, calibración y detecciones. La cámara virtual renderiza RGB real fuera de pantalla a 480 × 270 píxeles, sin anotaciones, desde una altura de 0,35 m y con el mismo campo horizontal de 80° que la vista principal. Los recuadros se agregan solo a la galería. El detector identifica componentes de color en los píxeles, un método limitado al entorno controlado: **no es SAM ni un modelo de IA**. Las detecciones pueden repetirse entre imágenes; la sección 09 Inventario las fusiona en objetos únicos (ver abajo).
-
-El mapa descubierto muestra puntos morados para posiciones de cámara agrupadas por proximidad. Pulsa un punto para recorrer las imágenes del grupo, o usa la lista que contiene todos los keyframes. La galería y las evidencias también permiten seleccionarlos. El panel muestra imagen, pose, orientación, campo de visión y recortes ampliados; la ampliación no añade detalle. Estas son posiciones de cámara; cada objeto del inventario aparece además como un punto de su color en ese mismo mapa.
-
-La sección 09 **Inventario** convierte las observaciones repetidas en un objeto por tablero: cada detección se localiza por marcación más tamaño aparente (el lado de 0,48 m es conocimiento previo compartido, como la geometría del sensor) usando la pose estimada del keyframe, nunca la real. Observaciones del mismo color a menos de 0,75 m se fusionan en una entrada con posición media, conteo de vistas, intervalo temporal y mejor evidencia (mayor área, doble si es frontal). Cada tarjeta enlaza a su keyframe de mejor evidencia; el mapa descubierto marca cada objeto con un punto de su color, la consola resume el conteo en la línea INVENT y la exportación incluye el arreglo `inventario`. Limitaciones honestas: la profundidad por tamaño aparente supone el tablero completo y de frente, así que las vistas oblicuas sobreestiman la distancia; la deriva de odometría desplaza las entradas igual que desplaza el mapa; dos tableros del mismo color a menos de 0,75 m se fusionarían por error.
-
-Al finalizar el recorrido o pausarlo, pulsa **Evaluar observaciones**. Esta acción del operador compara la evidencia frontal con las posiciones reales de los tableros, disponibles solo para evaluación y render. El detector y la selección de keyframes no reciben esas posiciones. Se exige una detección frontal no recortada cuya caja contenga el centro proyectado del tablero, y un ángulo real no mayor de 35°. Se elige la observación con mayor lado corto relativo a la imagen, con el ángulo como desempate. Para aprobar calidad el lado corto debe alcanzar el umbral configurable, inicialmente 48 px en una imagen de 480 px de ancho. Una detección frontal más pequeña permanece pendiente de una mejor captura; este criterio no estima distancia a partir de RGB. Las clases repetidas se consideran ambiguas. La evaluación queda desactualizada al guardar otra imagen y debe ejecutarse de nuevo.
-
-La odometría mide el movimiento real: encoders con 1 % de sesgo y 1 % de derrape (patinan sin avanzar si el robot está atascado) más giróscopo con ruido 0,002 rad y deriva 0,0002 rad/s; el lidar añade ruido gaussiano de 0,02 m en pared. El error crece con el recorrido y se muestra en telemetría; la consola tiene una línea SENS con velocidad de encoders y giro. La verdad queda reservada al observador, los keyframes guardan ambas poses y la exportación incluye semilla y error.
-
-En modo ruidoso, la **fusión de movimiento** contrasta encoders, giróscopo, contacto y LiDAR antes de alimentar el mapa. Conserva las mediciones originales y el modelo de patinaje. Un contacto detiene el empuje en esa dirección y descarta su avance de ruedas, conservando el giro medido; se puede girar, retroceder o soltar la dirección para intentar otra maniobra. Si el atasco ocurre entre dos pasos, puede quedar un pequeño error del avance parcial anterior al contacto: no copia ni restaura la pose real del simulador.
-
-Sin contacto, compara lecturas consecutivas contra una pared frontal aproximadamente plana, compensando giros pequeños con el giróscopo. Dos comprobaciones separadas de que las ruedas avanzan y la pared no se desplaza permiten corregir el avance acumulado, frenar y reobservar. Mientras la discrepancia no se confirma, no inserta esa lectura en el mapa. Una pared lateral, suelo, lecturas inválidas, referencias antiguas, cambios de geometría o giros grandes no justifican inmovilidad. Se supone que la pared usada como referencia es estática; esto no estima movimiento 3D ni elimina toda la deriva.
-
-La consola **FUSIÓN** separa avance de ruedas y aceptado, y muestra cuánto descartó o corrigió. El JSON incluye `fusion_movimiento` con estado, evidencia y hasta 100 eventos de contacto/corrección; las diez pruebas utilizan la misma fusión. La confirmación de patinaje frente a una pared no confirma por sí sola la posición global ni borra el contador de pérdida de localización.
-
-El mapa fusiona evidencia con log-odds: un muro necesita 2+ impactos para confirmarse (un pico de ruido aislado no basta) y un paso libre abre espacio fresco; los muros confirmados no se erosionan con rayos rasantes. En modo ruidoso cada barrido se alinea contra el mapa (scan matching correlativo en ventana local ±15 cm/±2,3°, con paso de 2,5 cm y búsqueda en cada barrido salvo ajuste ≥ 95 %) y corrige la odometría con un filtro complementario suave (15 % de la corrección por barrido). Los rayos se proyectan con la orientación estimada y la calibración, sin usar la orientación real del simulador. Las correcciones locales no garantizan limitar la deriva ni completar la casa o la sala grande: pueden detenerse con regiones pendientes y error superior a un metro. El control ideal no aplica correcciones a su odometría exacta. Las pruebas conservan ruido y sesgos, verifican seguridad y comprueban que las ejecuciones parciales no se declaren completas. La consola muestra conteo y magnitud de correcciones; la evaluación las reporta. `evaluate:ruido` puede salir con código 1 cuando no se cumplen cobertura o seguridad; eso no equivale a un fallo del proceso de diez pasadas.
-
-**Corrección durante la misión** activa un SLAM 2D experimental en el modo ruidoso. Conserva submapas construidos con lecturas reales de los sensores simulados, busca coincidencias al volver a una zona y verifica repetidamente las candidatas antes de aceptar un cierre de bucle. Cuando confirma uno, reconstruye el historial de observaciones en el mapa corregido. La consola muestra estado y últimos cierres. Activar o desactivar la opción reinicia la simulación; el control ideal conserva su pose exacta. Esta función mantiene el ruido, los sesgos y el patinaje y no garantiza una corrección global ni cobertura completa. No sustituye una validación con un robot físico.
-
-La semilla de prueba permite repetir una misión desde el arranque. La calibración inicial queda en la base conocida hasta el primer comando de motor; desde entonces el giróscopo deriva también en reposo. Cada referencia conserva 25 lecturas; se guardan hasta 120 submapas y 6.000 lecturas (600 segundos con lectura a 10 Hz). Al alcanzar el límite se señala y se suspende la corrección histórica; no se borra la evidencia anterior para aparentar un mapa completo. El reconocimiento busca hasta ±0,75 m/±0,24 rad, exige geometría distinguible, coincidencia de superficies y tres comprobaciones espaciadas. Una pared uniforme, datos desconocidos o rayos que atraviesen paredes conocidas no validan un cierre.
-
-Un cierre optimiza un grafo SE(2) anclado en el origen conocido y vuelve a integrar lecturas y contactos; también reconstruye las referencias históricas para evitar reutilizar geometría desactualizada. Se invalida la ruta y el robot reobserva sin avanzar hasta confirmar su nueva posición; la corrección por sí sola no reinicia el contador de pérdida de localización. Los keyframes conservan la pose estimada de captura. Los puntos del mapa y la fusión del inventario usan la pose histórica corregida, exportada por separado como `pose_mapa`; el JSON incluye nodos, restricciones, lecturas y cierres. La verdad del mundo no entra en el reconocimiento ni en el optimizador.
-
-La validación emparejada está en [docs/SLAM_VALIDATION.md](docs/SLAM_VALIDATION.md). Con la semilla 7 en la abertura, el error final baja de 0,2611 a 0,0669 m y mejora la cobertura; otras variantes siguen bloqueadas o incluso pierden cobertura. Los recorridos divergen después de una corrección, por lo que estas cifras comparan misiones completas y no garantizan mejora en cada instante o escena. Las diez pasadas son un banco de pruebas; la misión principal no exige diez recorridos físicos.
-
-La escena de desorden repite la casa con patas de mesa/silla (visibles pero delgadas) y cacharros bajos más un cable (invisibles al lidar 2D pero sólidos). Al topar, el robot retrocede con mapa verificado, pinta 3×3 ocupada donde golpeó, gira y replanifica (la consola cuenta topes): así la completa 99.8/99.6 con 2 topes; con ruido la deriva la deja en ~80 % pero segura. Es escenario de estrés: se aprueba terminando sin pasos inseguros. Un arranque libre pero justo de margen intenta escapar antes de declararse bloqueado.
-
-El sensor simulado lanza 121 rayos en un campo horizontal de 80° hasta 3,8 m. La cámara comparte ese campo horizontal independientemente de la proporción de la pantalla. El modelo ideal de suelo plano y paredes verticales puede entregar una medición válida de suelo hasta ese alcance; una lectura inválida o sin retorno sigue siendo desconocida. El mapa comienza desconocido salvo la huella inicial segura y cubre 8 × 8 m en las escenas pequeñas, 20 × 20 m en la grande o 14 × 12 m en la casa, a 0,1 m por celda. El porcentaje es celdas observadas sobre el dominio fijo seleccionado, no cobertura del suelo real ni indicador de SLAM. Las fronteras amarillas son celdas libres adyacentes a desconocidas; la línea verde indica la ruta. El sector representa la última lectura del sensor, recortada por los impactos medidos.
-
-El planificador solo emplea pose estimada y rejilla: busca posiciones libres alcanzables cerca de fronteras, mantiene la huella de 0,25 m alejada de celdas ocupadas o desconocidas con margen por discretización, y barre allí. Antes de avanzar verifica contra el mapa la huella en la posición actual, intermedia y siguiente. Evita repetir puntos de barrido separados por menos de 0,8 m. Si un destino ya descubierto no es alcanzable con la huella completa (`parcial` en `routeTo`, usado al navegar a un destino), no se niega a moverse: avanza por celdas seguras hasta la posición alcanzable más cercana al destino y replantea desde ahí; solo se rinde cuando ya está en esa posición y no hay progreso posible. Un destino todavía no descubierto no se persigue a ciegas: lo sigue buscando la exploración por fronteras. La huella nunca se recorta: el avance parcial llega hasta donde la huella entera cabe, no hasta el obstáculo. Si quedan fronteras sin una nueva observación segura, indica **exploración limitada**; si la posición actual no permite una ruta segura, indica bloqueo. Se puede volver a explorar explícitamente después de un resultado limitado o bloqueado. No hay garantía de cobertura completa en geometrías arbitrarias.
-
-La consola muestra velocidades, resumen del lidar, último keyframe, odometría, estado de localización y correa. La seguridad y el retorno a zona segura son opcionales y se activan con la casilla. **Máximo sin localización** limita el tiempo autónomo sin una posición confirmada: el tiempo total explorando no consume ese límite. Una lectura aislada, solo suelo o una pared uniforme no confirma la posición por sí sola; el monitor compara las lecturas con el mapa anterior y exige tres observaciones coherentes. El contador conserva una breve gracia de 0,6 s tras la última confirmación y se restablece cuando se confirma de nuevo. Una pausa humana congela el tiempo autónomo y el contador.
-
-Si se agota el límite, el robot deja de avanzar y realiza un barrido para intentar confirmar su posición; si no lo logra, se detiene con estado de localización perdida. No regresa a ciegas. La correa de distancia puede provocar el retorno por una ruta conocida cuando la posición está confirmada; si no lo está, el robot vuelve a observar. La confirmación es una comprobación simulada de consistencia, no una garantía de localización real ni un cierre de bucle global. La exportación incluye el estado y la evidencia resumida del monitor, además del tiempo autónomo total.
-
-El tiempo de simulación avanza a pasos fijos de 1/60 s; el tiempo acumulado por fotograma se limita para evitar saltos. Las marcas de tiempo del registro corresponden al tiempo simulado desde el inicio. El mapa, lecturas e imágenes viven en memoria hasta exportar o reiniciar. Sin la casilla de ruido, sensor y pose son ideales. Esta fase no incluye SAM, API de Meta ni hardware.
-
-## Motor de navegación
-
-`src/navigation.js` empaqueta la exploración como un motor reutilizable sin ruta ni mapa precargados: se suelta en un área desconocida y explora por fronteras mientras rearma el mapa de ocupación. El host solo alimenta rayos del sensor y movimiento medido de ruedas (`avance`, `giro`, `contacto`); el motor posee creencia, mapa, correcciones (fusión de movimiento, scan matching, SLAM opcional) y comandos.
-
-```js
-import { createNavigator } from './src/navigation.js';
-
-const nav = createNavigator(escenario.mapConfig, { seed: 7 }); // ruidoso por defecto
-nav.start();
-let motion = null;
-for (let step = 0; step < 24000 && !nav.terminal; step++) {
-  const rays = step % 6 === 0 ? sense(poseReal, escenario.walls, sensor) : null;
-  const command = nav.step(1 / 60, { rays, motion });
-  const prev = poseReal;
-  poseReal = advance(poseReal, command, 1 / 60, solidos(escenario));
-  motion = readMotion(adaptador, poseReal, prev, command, 1 / 60, poseReal.collision);
-}
-nav.summary(); // estado, mapa (nav.map), creencia, correcciones, fronteras…
-```
-
-La pose real y `advance`/`readMotion` son el adaptador del simulador (o los encoders reales); nunca entran al motor. `pause()`, `reset()`, `setLeash()` y `summary()` completan la API. La interfaz web todavía usa su bucle propio; migrarla a este motor es un paso posterior.
-
-Con `setDestination({ x, z })` el motor navega a un punto del marco creído: si ya existe ruta segura la sigue; si no, sigue explorando por fronteras y reintenta en cada plan hasta que el mapa la abre, y termina en `destino_alcanzado`. Un destino tras un paso intransitable nunca se declara alcanzado (termina limitado, sin chocar). La V2 lo expone con campos X/Z, botón **Ir al destino** y clic directo sobre el mapa descubierto.
-
-El mapa se puede persistir y reutilizar entre misiones: `saveMap()` exporta la rejilla y `createNavigator(config, { priorMap, priorFuerza })` la recarga con confianza decaída (0,5 por defecto), de modo que el mapa previo ancla la localización desde el arranque pero la evidencia nueva todavía puede corregir paredes mal pintadas. Medido: sobre el mapa de una misión ruidosa, la siguiente misión baja de 0,67 m a 0,03 m de error en la sala grande; sobre un mapa malo hereda el error (1,43 m), así que la calidad del mapa fuente manda. Si el robot no arranca donde el mapa cree, la relocalización es **automática**: con mapa previo, `start()` entra en estado `relocalizando` y el propio motor gira una vuelta completa, avanza ~0,7 m y vuelve a girar alimentando scans a `relocalize(rays, giro, avance)`; el usuario no ejecuta ningún protocolo. Una sola vista puede ser ambigua (lugares gemelos), así que cada hipótesis se rastrea re-puntuando su pose predicha y solo se acepta cuando explica todas las vistas, incluidas las posteriores a la traslación (donde los lugares espejo colapsan). Tras ubicarse, una vigilancia sigue puntuando los scans contra una copia congelada del mapa previo (nunca contra el mapa vivo, que absorbería el error) y puede revocar la pose si el acuerdo cae tras alejarse ≥2 m del punto de arranque, reintentando hasta 2 veces. En lugares pobres en rasgos puede no confirmar: reporta no hallada y explora desde la pose supuesta en vez de adivinar. Medido con Monte Carlo (25 salidas aleatorias por escena contra el mapa de una misión ruidosa, precisa = error <0,25 m y <0,15 rad): `partition` 24 precisas / 1 incorrecta / 0 no halladas (mediana 0,10 m); `departamento` 20 / 4 / 1 (0,09 m); `casa` 14 / 4 / 7 (0,16 m); `large` 0 / 3 / 22 — en la sala grande el mapa previo incompleto casi nunca permite confirmar, y el sistema prefiere no ubicarse (22) a adivinar, aunque 3 falsos positivos se cuelan: las habitaciones congruentes puntúan ~1,0 contra el mapa durante metros, así que el riesgo conocido restante es ubicarse en un cuarto gemelo. La V2 lo prueba cargando un mapa exportado y tildando **Salida desconocida**.
-
-La cámara simulada (`src/camera.js`, bearing + distancia con ruido y oclusión por paredes) aporta **marcas visuales**: los tableros que el robot ve se fusionan en el marco creído, se exportan con el mapa (`marcas`) y en la misión siguiente cada hipótesis de relocalización debe explicar también los objetos vistos, no solo la geometría. El escenario `casamoderna` (10 × 7 m) tiene dos dormitorios geométricamente idénticos que solo se distinguen por el color de su tablero. Medido con Monte Carlo (25 salidas, mapa previo ruidoso): sin marcas 17 precisas / **5 incorrectas** / 3 no halladas; con marcas 17 precisas / **0 incorrectas** / 8 no halladas (mediana 0,065 m en ambos). Las marcas no inventan precisión: convierten ubicaciones falsas en “no hallada”, que es la dirección segura. La sección 05 de la V2 muestra el cuarto en 3D tal como el robot lo va escaneando — solo celdas y objetos ya descubiertos por su mapa, con órbita libre o vista desde la pose creída — nunca la geometría real completa.
-
-Los muebles altos (nevera, cocina, sofá, mesa, camas, armarios) son geometría real en `casamoderna` y `large`: el lidar los ve, la física choca con ellos y los fijos llevan etiqueta de cámara como marcas. Cada cuarto está amueblado distinto. Medido: en `casamoderna` la geometría de los muebles sola ya desempata los gemelos (sin marcas de cámara: 17 precisas / 5 incorrectas pasó a 19 / **0 incorrectas** / 6 no halladas); en `large` las falsas bajan de 3 a 1 pero las precisas siguen en 0 (el cuello ahí es la calidad del mapa previo, no los rasgos), y la deriva de la misión grande cae de 1,27 m a ~0,03–0,19 m porque el scan-matching por fin tiene esquinas interiores donde agarrarse. El costo también se midió: la casa amueblada termina `limitado` (franjas tras muebles a ras de pared que nadie puede observar) y la sala grande necesita ~27 500 pasos en vez de 24 000.
-
-La exploración atraviesa puertas reales: el planificador busca primero con holgura completa y, si el mapa ruidoso la borra, con la holgura del footprint (la guarda `footprintClear` sigue mandando en cada paso); las rutas se centran en los huecos en vez de rozar las jambas, un paso bloqueado replantea en vez de abortar la misión, y las fronteras solo cuentan si están conectadas por espacio libre con el robot (las celdas fantasma pintadas por ruido tras una pared ya no dejan la misión en `limitado` eterno). Cada escenario puede declarar su `inicio`; en `casamoderna` la misión ruidosa completa con 0 colisiones y error de 0,09 m.
-
-## Referencias del enfoque
-
-- [Yamauchi, exploración por fronteras (1997)](https://www.cs.cmu.edu/~motionplanning/papers/sbp_papers/integrated2/yamauchi_frontier_explor.pdf).
-- [Nav2, margen alrededor de obstáculos y tratamiento de espacio desconocido](https://docs.nav2.org/rolling/configuration_and_development/configuration_guide/core_servers/costmap_2d/costmap_plugins/inflation/).
-- [Three.js, renderizado y lectura de píxeles](https://threejs.org/docs/pages/WebGLRenderer.html).
-- [MDN, estructura RGBA de ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
-
-Son referencias conceptuales. Este laboratorio usa una implementación propia en JavaScript y no ejecuta ROS ni Nav2.
-
-### Captura y revisión de zonas
-
-En la navegación sobre el escaneo, el sensor de profundidad sigue siendo frontal (80°), distinto de la cámara RGB. El dibujo de sus rayos usa la orientación estimada una sola vez. Los barridos de exploración terminan al cubrir el círculo con lecturas recibidas cerca de la misma posición, sin exigir otra vuelta completa; cambiar de posición reinicia esa cobertura y una recuperación por bloqueo solicita nuevas lecturas. Sin cobertura suficiente se conserva el límite de una vuelta. La pausa conserva el avance del barrido o la ruta. Los experimentos del motor genérico conservan sus barridos completos por defecto (`adaptiveSweeps: false`); la sesión Polycam activa la opción. La relocalización mantiene sus maniobras específicas.
-
-La cámara usa la inclinación calibrada de cada captura para transformar sus mediciones a la pose estimada. En el cierre de zonas, las imágenes por zona son vistas simuladas guardadas desde puntos propuestos no visitados; el observador y el corredor son previsualizaciones, no evidencia del robot. Cerrar una zona es una decisión humana, no una confirmación de IA.
+[Delivery note](ENTREGA-2026-11-04.md) · [Project scope](docs/PROJECT_CONTEXT.md)
