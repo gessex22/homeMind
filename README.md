@@ -14,6 +14,14 @@ The demo runs in a browser using a scan of a real room. **The robot, its sensors
 
 This is a supervised prototype. Exploration can stop before covering the whole room, and an AI observation does not guarantee that the robot can reach the object.
 
+![Virtual robot camera beside the discovered map, with a blue route and a red destination](docs/images/navigation.jpg)
+
+*Simulated navigation toward a manually selected destination.*
+
+![Sensor map and 3D reconstruction of the space discovered by the simulated robot](docs/images/discovered-maps.jpg)
+
+*Discovered space shown as a sensor map and a 3D reconstruction.*
+
 ## Where we want to go
 
 A physical robot that responds to requests such as **“go to the charger”**: finding the target, reaching it and, eventually, docking.

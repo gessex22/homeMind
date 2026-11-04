@@ -14,6 +14,14 @@ La demo funciona en el navegador sobre el escaneo de una habitación real. **El 
 
 Es un prototipo supervisado. La exploración puede detenerse sin cubrir toda la habitación y detectar un objeto no garantiza poder llegar a él.
 
+![Cámara del robot virtual junto al mapa descubierto, con la ruta azul y el destino rojo](docs/images/navigation.jpg)
+
+*Navegación simulada hacia un destino elegido manualmente.*
+
+![Mapa de sensores y reconstrucción 3D del espacio descubierto por el robot simulado](docs/images/discovered-maps.jpg)
+
+*Espacio descubierto representado como mapa de sensores y reconstrucción 3D.*
+
 ## Objetivo final
 
 Un robot físico que responda a peticiones como **«ve al cargador»**: encontrar el objetivo, llegar hasta él y, más adelante, acoplarse.
