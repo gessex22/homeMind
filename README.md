@@ -8,9 +8,12 @@ An early prototype exploring how a home robot could understand a request and mov
 
 The demo runs in a browser using a scan of a real room. **The robot, its sensors and its movement are simulated.**
 
-- It explores and builds a map, and you can choose a destination in the area it has discovered.
-- On request, Muse Spark interprets the robot's camera image and SAM identifies a visible object. These are real calls to Meta's AI models.
-- It can attempt to approach that object when it has enough distance information and a known route.
+- **Mapping & autonomous exploration:** builds a 2D map from virtual depth readings, distinguishing free space, obstacles and unknown areas.
+- **Pose estimation:** tracks the robot's position and heading from simulated motion readings, with optional sensor noise.
+- **Navigation & route planning:** moves toward selected destinations in discovered space and replans when a route is blocked.
+- **Object recognition & segmentation:** on request, Muse Spark interprets the camera image and SAM outlines a visible target through real Meta API calls.
+- **Object localization & approach:** estimates the target's position using virtual depth and attempts to reach a nearby point when a known route is available.
+- **Visualization & export:** shows the virtual camera, sensor map and 3D reconstruction; exports maps, run summaries and AI observations.
 
 This is a supervised prototype. Exploration can stop before covering the whole room, and an AI observation does not guarantee that the robot can reach the object.
 

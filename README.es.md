@@ -8,9 +8,12 @@ Un prototipo inicial para explorar cómo un robot doméstico podría entender un
 
 La demo funciona en el navegador sobre el escaneo de una habitación real. **El robot, sus sensores y su movimiento son simulados.**
 
-- Explora y construye un mapa; puedes elegir un destino en la zona descubierta.
-- Cuando lo solicitas, Muse Spark interpreta la imagen de su cámara y SAM identifica un objeto visible. Las llamadas a los modelos de Meta son reales.
-- Puede intentar acercarse al objeto si dispone de suficiente información de distancia y una ruta conocida.
+- **Mapeo y exploración autónoma:** construye un mapa 2D con lecturas de profundidad virtual, distinguiendo espacio libre, obstáculos y zonas desconocidas.
+- **Estimación de posición:** sigue la ubicación y orientación del robot a partir de su movimiento simulado, con ruido de sensores opcional.
+- **Navegación y planificación de rutas:** avanza hacia destinos elegidos en el espacio descubierto y recalcula la ruta si encuentra un bloqueo.
+- **Reconocimiento y segmentación de objetos:** cuando lo solicitas, Muse Spark interpreta la imagen de la cámara y SAM delimita un objetivo visible mediante llamadas reales a Meta.
+- **Localización y aproximación al objeto:** estima la posición del objetivo con profundidad virtual e intenta acercarse a un punto próximo si existe una ruta conocida.
+- **Visualización y exportación:** muestra la cámara virtual, el mapa de sensores y la reconstrucción 3D; permite exportar mapas, resúmenes del recorrido y observaciones de IA.
 
 Es un prototipo supervisado. La exploración puede detenerse sin cubrir toda la habitación y detectar un objeto no garantiza poder llegar a él.
 
