@@ -2,7 +2,7 @@
 
 [Español](README.es.md)
 
-An early prototype exploring how a home robot could understand a request and move toward the right object.
+An early prototype of a reusable autonomy capability for robots: mapping their surroundings, estimating where they are and navigating toward destinations.
 
 ## What works today
 
@@ -27,9 +27,9 @@ This is a supervised prototype. Exploration can stop before covering the whole r
 
 ## Where we want to go
 
-A physical robot that responds to requests such as **“go to the charger”**: finding the target, reaching it and, eventually, docking.
+Develop a capability that different physical robots could use to move around with greater independence. Future applications could include patrols, inventory tasks and returning to a charging station when the battery is low.
 
-We still need to complete the recognition-to-navigation integration, search for objects outside the current view, remember them across observations, and validate the system on real hardware. Physical docking and charging have not been demonstrated.
+We still need to complete the recognition-to-navigation integration, search for objects outside the current view, remember them across observations, and validate the system on real hardware. These task applications, battery-triggered return, physical docking and charging remain future work.
 
 ## Try it
 

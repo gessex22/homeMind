@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Let a home robot act on everyday requests without asking the user for coordinates. The motivating example is returning to its charger.
+Develop a reusable autonomy capability that helps robots map their surroundings, estimate their position and navigate toward destinations with less manual guidance.
+
+Returning to a charger when the battery is low is one motivating use case. The same capability could support future patrol or inventory systems. These are intended applications; the current prototype tests the underlying navigation capability in simulation.
 
 ## Current stage
 
@@ -15,7 +17,7 @@ Recognition and its connection to navigation are not yet fully integrated. The c
 1. Complete and validate recognition of a visible target and its connection to navigation, then search when the target is outside the current view.
 2. Remember the same object across observations.
 3. Test navigation and perception on a physical robot.
-4. Develop and validate charger alignment, docking and charging.
+4. Develop task integrations, including battery-triggered return, charger alignment, docking and charging.
 
 ## What the prototype establishes
 

@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-Un prototipo inicial para explorar cómo un robot doméstico podría entender una petición y acercarse al objeto indicado.
+Un prototipo inicial de una capacidad de autonomía reutilizable para robots: mapear su entorno, estimar dónde están y navegar hacia distintos destinos.
 
 ## Qué hace hoy
 
@@ -27,9 +27,9 @@ Es un prototipo supervisado. La exploración puede detenerse sin cubrir toda la 
 
 ## Objetivo final
 
-Un robot físico que responda a peticiones como **«ve al cargador»**: encontrar el objetivo, llegar hasta él y, más adelante, acoplarse.
+Desarrollar una capacidad que distintos robots físicos puedan utilizar para moverse con mayor independencia. A futuro podría apoyar tareas de vigilancia, inventario o regreso a una estación de carga cuando la batería esté baja.
 
-Falta completar la integración entre reconocimiento y navegación, buscar objetos fuera de la vista actual, recordarlos entre observaciones y validar el sistema con hardware real. Todavía no se ha demostrado acoplamiento ni carga física.
+Falta completar la integración entre reconocimiento y navegación, buscar objetos fuera de la vista actual, recordarlos entre observaciones y validar el sistema con hardware real. Las aplicaciones mencionadas, el retorno por batería baja, el acoplamiento y la carga física siguen pendientes.
 
 ## Probarlo
 
