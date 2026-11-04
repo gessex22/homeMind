@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeMind V2 · Motor de navegación</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #f4f7f4; color: #27483b; }
+  main { max-width: 1020px; margin: 0 auto; padding: 24px 16px 40px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 13px; letter-spacing: .06em; margin: 0; }
+  p, .note { color: #718a7c; font-size: 12px; line-height: 1.55; }
+  a { color: #235e4d; font-weight: 700; }
+  .card { background: #fff; border: 1px solid #e2eae3; border-radius: 10px; padding: 16px; margin-top: 16px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+  .head span { color: #3d7e61; font-size: 11px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(220px, 1fr); gap: 16px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  canvas { display: block; width: 100%; aspect-ratio: 1; background: #e9eeeb; border: 1px solid #d5e1d8; border-radius: 8px; image-rendering: pixelated; }
+  .tele { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 12px; }
+  .tele dt { color: #678477; font-weight: 700; }
+  .tele dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  select, button, input[type="number"] { padding: 8px 10px; border: 1px solid #d5e1d8; border-radius: 6px; background: #fff; color: #27483b; font: inherit; font-size: 13px; }
+  input[type="number"] { width: 64px; }
+  button { cursor: pointer; font-weight: 700; }
+  button.primary { background: #235e4d; color: #fff; border-color: #235e4d; }
+  label { font-size: 12px; font-weight: 700; color: #678477; display: inline-flex; gap: 6px; align-items: center; }
+  pre { margin: 0; background: #10201b; color: #c9e8d4; border-radius: 8px; padding: 12px 14px; font: 12px/1.7 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; }
+  kbd { border: 1px solid #dce6de; background: #f9fbf8; border-radius: 4px; padding: 2px 6px; font-size: 11px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>HomeMind V2 · Motor de navegación</h1>
+  <p><a href="scan.html">Abrir tu escaneo real de Polycam ↗</a> · Visor de la captura completa para el observador; todavía no es un mapa del robot.</p>
+  <p>La misma información del laboratorio, corriendo el motor nuevo (<code>src/navigation.js</code>): se suelta en (0, 0) sin ruta ni mapa precargados. <a href="index.html">Volver a V1</a>. La vista 3D de abajo muestra el cuarto tal como el robot lo va escaneando: solo aparece lo que su mapa ya descubrió.</p>
+
+  <section class="card">
+    <div class="head"><h2>03 / CONTROLES</h2><span id="explorer-status">Exploración lista</span></div>
+    <div class="bar">
+      <select id="escenario" aria-label="Escenario"></select>
+      <label><input type="checkbox" id="ruido" checked> Sensores ruidosos</label>
+      <label><input type="checkbox" id="slam"> SLAM 2D</label>
+      <label>Velocidad <select id="velocidad"><option value="1">×1</option><option value="4">×4</option><option value="16" selected>×16</option><option value="60">×60</option></select></label>
+      <button id="toggle" class="primary">Pausar</button>
+      <button id="reiniciar">Reiniciar</button>
+      <button id="exportar">Exportar</button>
+    </div>
+    <div class="bar" style="margin-top:10px">
+      <label><input type="checkbox" id="correa"> Correa</label>
+      <label>Máx. distancia <input type="number" id="correa-dist" value="5" min="1" step="0.5"> m</label>
+      <label>Tiempo sin localización <input type="number" id="correa-tiempo" value="60" min="5" step="5"> s</label>
+      <span class="note">Manual: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas (pausa el motor mientras conducís)</span>
+    </div>
+    <div class="bar" style="margin-top:10px">
+      <label>Destino X <input type="number" id="dest-x" value="0" step="0.5"></label>
+      <label>Z <input type="number" id="dest-z" value="-2" step="0.5"></label>
+      <button id="ir" class="primary">Ir al destino</button>
+      <button id="limpiar-destino">Limpiar</button>
+      <span class="note">o clic en el mapa descubierto · si aún no hay ruta, explora y reintenta</span>
+    </div>
+    <div class="bar" style="margin-top:10px">
+      <label>Mapa previo <input type="file" id="mapa-file" accept=".json"></label>
+      <span class="note" id="mapa-nombre">ninguno</span>
+      <label><input type="checkbox" id="salida-x"> Salida desconocida (probar relocalización)</label>
+      <span class="note" id="relo-estado"></span>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <div class="head"><h2>01 / MAPA DESCUBIERTO</h2><span id="map-stats">—</span></div>
+      <canvas id="occupancy" width="640" height="640"></canvas>
+    </section>
+    <section class="card">
+      <div class="head"><h2>02 / TELEMETRÍA</h2><span id="motion-state">● DETENIDO</span></div>
+      <dl class="tele">
+        <dt>X creída</dt><dd id="t-x">—</dd>
+        <dt>Z creída</dt><dd id="t-z">—</dd>
+        <dt>Guiñada</dt><dd id="t-yaw">—</dd>
+        <dt>Error odom (obs.)</dt><dd id="t-error">—</dd>
+        <dt>Contacto</dt><dd id="t-col">SIN CONTACTO</dd>
+        <dt>Tiempo sim.</dt><dd id="t-time">—</dd>
+        <dt>Colisiones</dt><dd id="t-bumps">0</dd>
+        <dt>Retorno</dt><dd id="t-ret">no</dd>
+        <dt>Destino</dt><dd id="t-dest">—</dd>
+      </dl>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="head"><h2>04 / CONSOLA DE SENSORES</h2><span>SOLO LECTURAS DEL ROBOT</span></div>
+    <pre id="console">—</pre>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>05 / VISTA 3D DEL ESCANEO</h2><span>SOLO LO QUE EL ROBOT DESCUBRIÓ</span></div>
+    <div class="bar" style="margin-bottom:10px">
+      <button id="vista-orbita" class="primary">Órbita</button>
+      <button id="vista-robot">Vista del robot</button>
+      <span class="note">Arrastrá para orbitar · la vista del robot es su pose creída, no la real</span>
+    </div>
+    <canvas id="vista3d" width="640" height="640"></canvas>
+    <p class="note">Paredes y objetos aparecen cuando el mapa creído los conoce. Los tableros descubiertos se ven en su color: son las marcas que la cámara usa para no confundir cuartos gemelos al relocalizar.</p>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>06 / OBSERVADOR HUMANO</h2><span>NO ES UN SENSOR DEL ROBOT</span></div>
+    <canvas id="observer" width="640" height="640"></canvas>
+    <p class="note">Geometría real para supervisión: paredes, tableros y trayectoria verdadera. El motor nunca la ve.</p>
+  </section>
+</main>
+<script type="module" src="/src/motor-main.js"></script>
+</body>
+</html>

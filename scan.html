@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173f3d">
+  <title>HomeMind · Escaneo Polycam</title>
+  <link rel="stylesheet" href="/src/scan.css">
+</head>
+<body>
+  <main>
+    <header>
+      <a class="brand" href="motor.html">H<span>·</span> <small>HOMEMIND / CAPTURA REAL</small></a>
+      <a class="back" href="motor.html">Volver al motor ↗</a>
+    </header>
+    <div class="heading">
+      <div><p class="eyebrow">POLYCAM · 28 OCT 2026</p><h1>Tu espacio, en 3D<span>.</span></h1><p class="intro">El modelo y las fotografías de tu captura, abiertos directamente en el navegador.</p></div>
+      <span class="badge">ESCANEO REAL</span>
+    </div>
+    <div class="layout">
+      <section class="viewer" aria-label="Visor del escaneo real">
+        <div class="toolbar" aria-label="Vistas de cámara">
+          <button id="view-orbit" class="selected" aria-pressed="true">Órbita</button>
+          <button id="view-inside" aria-pressed="false">Interior</button>
+          <button id="view-plan" aria-pressed="false">Planta</button>
+          <button id="view-complete" aria-pressed="false">Modelo completo</button>
+        </div>
+        <div id="scan-viewport">
+          <canvas id="scan-canvas" aria-label="Modelo 3D de la captura Polycam; arrastra para girar y usa la rueda para acercarte"></canvas>
+          <div class="view-label" id="view-label">ÓRBITA · CORTE VISUAL</div>
+          <div id="loading" role="status">Cargando el modelo y sus texturas…</div>
+          <div class="gesture">Arrastra para girar · rueda para acercarte · botón derecho para desplazar</div>
+        </div>
+        <div class="viewer-footer"><span id="scan-status" role="status">Preparando captura…</span><button id="save-render" disabled>Guardar render PNG ↓</button></div>
+      </section>
+      <aside>
+        <section class="panel">
+          <p class="eyebrow">01 / ARCHIVO ORIGINAL</p><h2>La captura</h2>
+          <p class="filename">10_28_2026.glb</p>
+          <dl><dt>Mallas</dt><dd id="scan-meshes">—</dd><dt>Triángulos</dt><dd id="scan-triangles">—</dd><dt>Texturas</dt><dd id="scan-textures">—</dd><dt>Tamaño</dt><dd>4,66 MB</dd></dl>
+          <div class="dimensions"><span>EXTENSIÓN DEL ESCANEO</span><strong id="scan-dimensions">—</strong><small id="scan-height">—</small></div>
+          <p class="note" id="scale-status">Escala aproximada del archivo. Referencia real: baldosa de 32,7 cm sin junta.</p>
+          <button id="measure-tile" disabled>Marcar lado de baldosa</button>
+          <button id="reset-scale">Restaurar escala del archivo</button>
+          <p class="note" id="measure-status" role="status">Marca ambos extremos del mismo lado, excluyendo la junta. Puedes acercarte con la rueda.</p>
+          <a class="download" href="/scans/polycam-2026-10-28/10_28_2026.glb" download="10_28_2026.glb">Descargar GLB original ↗</a>
+        </section>
+        <section class="panel">
+          <p class="eyebrow">02 / INSPECCIÓN</p><h2>Ver por dentro</h2>
+          <label class="check"><input id="cut-enabled" type="checkbox" checked> Corte horizontal</label>
+          <label class="range-label" for="cut-height">ALTURA DEL CORTE <output id="cut-value">—</output></label>
+          <input id="cut-height" type="range" min="0.2" max="3" value="1.9" step="0.05" disabled>
+          <p class="note">El corte oculta las superficies superiores para inspeccionar el interior. El archivo se conserva completo.</p>
+          <label class="check"><input id="show-textures" type="checkbox" checked> Texturas de la captura</label>
+          <label class="check"><input id="show-grid" type="checkbox" checked> Rejilla de referencia</label>
+        </section>
+        <section class="panel context">
+          <p class="eyebrow">03 / HOMEMIND</p><h2>Primero, inspeccionar</h2>
+          <p>Esta vista muestra la captura completa al observador. El robot todavía no recibe este modelo como mapa.</p>
+          <p>Prueba el motor con profundidad virtual y suelo detectado. Los huecos de captura detienen el recorrido.</p>
+          <a class="download" href="scan-navigation.html">Probar navegación en esta captura ↗</a>
+        </section>
+      </aside>
+    </div>
+    <footer><span>HOMEMIND · RECONSTRUCCIÓN CAPTURADA</span><span>Visualización local · sin subir el archivo a servicios externos</span></footer>
+  </main>
+  <script type="module" src="/src/scan-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+{
+  "description": "Mismos sensores, sesgo y semillas. Las rutas pueden divergir tras una corrección; comparación de misiones, no de trayectoria idéntica.",
+  "comparisons": [
+    {
+      "scenario": "partition",
+      "seed": 7,
+      "baseline": {
+        "loopClosure": false,
+        "state": "limitado",
+        "errorM": 0.2611,
+        "yawDegrees": 9.13,
+        "floorPercent": 96.94,
+        "wallPercent": 93.45,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 94.55,
+        "slam": {
+          "status": "desactivado",
+          "scans": 0,
+          "submaps": 0,
+          "nodes": 0,
+          "closures": 0,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      },
+      "corrected": {
+        "loopClosure": true,
+        "state": "limitado",
+        "errorM": 0.0669,
+        "yawDegrees": 2.65,
+        "floorPercent": 99.54,
+        "wallPercent": 100,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 61.83,
+        "slam": {
+          "status": "aprendiendo",
+          "scans": 619,
+          "submaps": 40,
+          "nodes": 169,
+          "candidates": 32,
+          "rejected": 25,
+          "confirmations": 0,
+          "closures": 1,
+          "events": [
+            {
+              "time": 41.5,
+              "reference": 22,
+              "current": 116,
+              "score": 0.9527777784400516,
+              "confirmations": 3,
+              "correctionM": 0.02236313271368809,
+              "correctionYaw": 0.03865880861511384,
+              "costBefore": 2.860931140083396,
+              "costAfter": 0.009814225908171726
+            }
+          ],
+          "limited": false
+        },
+        "closureObserver": [
+          {
+            "time": 41.5,
+            "errorBeforeM": 0.02298650038316954,
+            "errorAfterM": 0.04534895862938504,
+            "yawBefore": 0.06582014671884152,
+            "yawAfter": 0.027161338103727672
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "partition",
+      "seed": 7926,
+      "baseline": {
+        "loopClosure": false,
+        "state": "bloqueado",
+        "errorM": 0.0998,
+        "yawDegrees": 3.37,
+        "floorPercent": 98.99,
+        "wallPercent": 95.52,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 30.35,
+        "slam": {
+          "status": "desactivado",
+          "scans": 0,
+          "submaps": 0,
+          "nodes": 0,
+          "closures": 0,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      },
+      "corrected": {
+        "loopClosure": true,
+        "state": "bloqueado",
+        "errorM": 0.0998,
+        "yawDegrees": 3.37,
+        "floorPercent": 98.99,
+        "wallPercent": 95.52,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 30.35,
+        "slam": {
+          "status": "aprendiendo",
+          "scans": 304,
+          "submaps": 19,
+          "nodes": 86,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "closures": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      }
+    },
+    {
+      "scenario": "casa",
+      "seed": 7,
+      "baseline": {
+        "loopClosure": false,
+        "state": "bloqueado",
+        "errorM": 0.0223,
+        "yawDegrees": 1.7,
+        "floorPercent": 56.34,
+        "wallPercent": 18.78,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 13.72,
+        "slam": {
+          "status": "desactivado",
+          "scans": 0,
+          "submaps": 0,
+          "nodes": 0,
+          "closures": 0,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      },
+      "corrected": {
+        "loopClosure": true,
+        "state": "bloqueado",
+        "errorM": 0.0223,
+        "yawDegrees": 1.7,
+        "floorPercent": 56.34,
+        "wallPercent": 18.78,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 13.72,
+        "slam": {
+          "status": "aprendiendo",
+          "scans": 138,
+          "submaps": 8,
+          "nodes": 41,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "closures": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      }
+    },
+    {
+      "scenario": "casa",
+      "seed": 7926,
+      "baseline": {
+        "loopClosure": false,
+        "state": "limitado",
+        "errorM": 0.2746,
+        "yawDegrees": 3.35,
+        "floorPercent": 94.52,
+        "wallPercent": 80,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 289.12,
+        "slam": {
+          "status": "desactivado",
+          "scans": 0,
+          "submaps": 0,
+          "nodes": 0,
+          "closures": 0,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      },
+      "corrected": {
+        "loopClosure": true,
+        "state": "limitado",
+        "errorM": 0.3949,
+        "yawDegrees": 11.27,
+        "floorPercent": 77.97,
+        "wallPercent": 52.45,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 163,
+        "slam": {
+          "status": "verificando",
+          "scans": 1630,
+          "submaps": 108,
+          "nodes": 446,
+          "candidates": 251,
+          "rejected": 218,
+          "confirmations": 2,
+          "closures": 1,
+          "events": [
+            {
+              "time": 91.5,
+              "reference": 142,
+              "current": 257,
+              "score": 0.932065218039181,
+              "confirmations": 3,
+              "correctionM": 0.16039123470093214,
+              "correctionYaw": 0.027365350588984594,
+              "costBefore": 24.413543486944853,
+              "costAfter": 0.017295142082880514
+            }
+          ],
+          "limited": false
+        },
+        "closureObserver": [
+          {
+            "time": 91.5,
+            "errorBeforeM": 0.2747394290934432,
+            "errorAfterM": 0.11449201157723184,
+            "yawBefore": 0.023981259760678775,
+            "yawAfter": 0.05134661034966337
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "large",
+      "seed": 7,
+      "baseline": {
+        "loopClosure": false,
+        "state": "bloqueado",
+        "errorM": 1.25,
+        "yawDegrees": 14.32,
+        "floorPercent": 58.28,
+        "wallPercent": 18.92,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 126.57,
+        "slam": {
+          "status": "desactivado",
+          "scans": 0,
+          "submaps": 0,
+          "nodes": 0,
+          "closures": 0,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      },
+      "corrected": {
+        "loopClosure": true,
+        "state": "bloqueado",
+        "errorM": 1.25,
+        "yawDegrees": 14.32,
+        "floorPercent": 58.28,
+        "wallPercent": 18.92,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 126.57,
+        "slam": {
+          "status": "aprendiendo",
+          "scans": 1266,
+          "submaps": 83,
+          "nodes": 331,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "closures": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      }
+    },
+    {
+      "scenario": "large",
+      "seed": 7926,
+      "baseline": {
+        "loopClosure": false,
+        "state": "bloqueado",
+        "errorM": 1.504,
+        "yawDegrees": 15.68,
+        "floorPercent": 95.86,
+        "wallPercent": 47.9,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 309.13,
+        "slam": {
+          "status": "desactivado",
+          "scans": 0,
+          "submaps": 0,
+          "nodes": 0,
+          "closures": 0,
+          "candidates": 0,
+          "rejected": 0,
+          "confirmations": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      },
+      "corrected": {
+        "loopClosure": true,
+        "state": "bloqueado",
+        "errorM": 1.504,
+        "yawDegrees": 15.68,
+        "floorPercent": 95.86,
+        "wallPercent": 47.9,
+        "collisions": 0,
+        "unsafeSteps": 0,
+        "seconds": 309.13,
+        "slam": {
+          "status": "sin_referencia_distinguible",
+          "scans": 3092,
+          "submaps": 120,
+          "nodes": 773,
+          "candidates": 54,
+          "rejected": 54,
+          "confirmations": 0,
+          "closures": 0,
+          "events": [],
+          "limited": false
+        },
+        "closureObserver": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "reason": "suelo_no_verificado",
+  "calibration": {
+    "asset": "10_28_2026.glb",
+    "referenceCm": 32.7,
+    "measuredCaptureM": 0.30952030123121743,
+    "scale": 1.056473513043414,
+    "endpoints": [
+      {
+        "x": -0.8130256516150282,
+        "y": 0.034050462346220556,
+        "z": -1.265903099464174
+      },
+      {
+        "x": -0.5035381404052376,
+        "y": 0.049449351313705314,
+        "z": -1.2613978492565463
+      }
+    ],
+    "method": "Dos puntos sobre baldosa sin junta",
+    "timestamp": "2026-10-28T23:23:28.32Z"
+  },
+  "steps": 1575,
+  "seconds": 26.25,
+  "distance": 1.815221405029294,
+  "contacts": 0,
+  "groundStops": 1,
+  "positionError": 0.04646070960935381,
+  "geometry": {
+    "floorY": 0.05501013814505644,
+    "freeAreaM2": 5.520000000000001,
+    "occupiedAreaM2": 2.7025000000000006,
+    "unknownCells": 3935,
+    "possibleStarts": 411,
+    "clearanceM": 0.44999999999999996,
+    "triangleCount": 118302,
+    "layers": 5,
+    "segments": 4792
+  },
+  "navigation": {
+    "estado": "pausado",
+    "terminal": false,
+    "creencia": {
+      "x": 0.12515671865115716,
+      "z": -0.07994226032690266,
+      "yaw": -2.4227546832380065
+    },
+    "tiempo_s": 26.25,
+    "celdas": {
+      "libre": 2083,
+      "ocupado": 523,
+      "desconocido": 4618
+    },
+    "conocidas_pct": 36.07,
+    "fronteras": 154,
+    "barridos": 3,
+    "correcciones_scan": 80,
+    "deriva_corregida_m": 0.216,
+    "retorno": "no",
+    "base": {
+      "x": -1.175,
+      "z": -0.9249999999999998
+    },
+    "destino": null,
+    "mapa_previo": false,
+    "marcas_previas": 0,
+    "relocalizacion": null,
+    "slam": {
+      "status": "desactivado",
+      "scans": 0,
+      "submaps": 0,
+      "nodes": 0,
+      "closures": 0,
+      "candidates": 0,
+      "rejected": 0,
+      "confirmations": 0,
+      "events": [],
+      "limited": false
+    },
+    "fusion_movimiento": {
+      "enabled": true,
+      "status": "lidar_insuficiente",
+      "contacts": 0,
+      "stalls": 0,
+      "encoderM": 0,
+      "acceptedM": 0,
+      "suppressedM": 0,
+      "correctedM": 0,
+      "blockedDirection": 0,
+      "lidar": {
+        "reliable": false,
+        "reason": "giro_o_calibracion"
+      },
+      "events": []
+    }
+  }
+}
