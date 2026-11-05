@@ -1,5 +1,7 @@
 # HomeMind
 
+El código original de HomeMind se distribuye bajo la [licencia MIT](LICENSE). El software, los modelos y los recursos de terceros están sujetos a sus propias licencias y condiciones.
+
 [English](README.md)
 
 Un prototipo inicial de una capacidad de autonomía reutilizable para robots: mapear su entorno, estimar dónde están y navegar hacia distintos destinos.

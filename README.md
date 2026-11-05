@@ -1,5 +1,7 @@
 # HomeMind
 
+HomeMind's original source code is available under the [MIT License](LICENSE). Third-party software, models and assets remain subject to their respective licenses and terms.
+
 [Español](README.es.md)
 
 An early prototype of a reusable autonomy capability for robots: mapping their surroundings, estimating where they are and navigating toward destinations.
